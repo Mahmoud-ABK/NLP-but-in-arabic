@@ -1,0 +1,16 @@
+I used "sudo dnf install tesseract tesseract-langpack-ara "
+
+tesseract --list-langs
+
+List of available languages in "/usr/share/tesseract/tessdata/" (3):
+ara
+eng
+fra
+
+
+this step is necessary for pytesseract to work 
+
+we may need to containerise this in docker or podman for scalability 
+
+
+pip install pytesseract pdf2image Pillow
