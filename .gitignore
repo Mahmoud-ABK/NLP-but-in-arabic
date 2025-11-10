@@ -22,3 +22,4 @@
 .virtual_documents
 # Ignore any PDF files under scrapping folder (anywhere)
 scrapping/**/*.pdf
+scrapping/**/*.docx
