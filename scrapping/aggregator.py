@@ -142,9 +142,50 @@ def addAJP():
 		writer.writerows(new_rows)
 # Post-process AM rows in fullarticles.csv to fill general_field from path
 def fill_general_field_for_AM():
+	full_path = os.path.join(os.path.dirname(__file__), 'fullarticles.csv')
+	header = FULLARTICLES_COLUMNS
+	full_dir = os.path.dirname(full_path)
+	rows = []
+	with open(full_path, newline='', encoding='utf-8') as f:
+		reader = csv.reader(f)
+		rows = list(reader)
+	# If header is present in file, skip it
+	if rows and rows[0] == header:
+		data_rows = rows[1:]
+	else:
+		data_rows = rows
+	updated_rows = []
+	for row in data_rows:
+		if len(row) < len(header):
+			row += [''] * (len(header) - len(row))
+		if 'source' in header:
+			src_val = row[header.index('source')]
+			if src_val.startswith('AM_'):
+				# Split source into AM and sth
+				parts = src_val.split('_', 1)
+				row[header.index('source')] = 'AM'
+				row[header.index('general_field')] = parts[1] if len(parts) > 1 else ''
+			elif src_val == 'AM':
+				path_val = row[header.index('path')]
+				parts = path_val.split(os.sep)
+				try:
+					am_index = parts.index('AM')
+					field = parts[am_index + 1] if len(parts) > am_index + 1 else ''
+				except ValueError:
+					field = ''
+				row[header.index('general_field')] = field
+		updated_rows.append(row)
+	# Write back (without header)
+	with open(full_path, 'w', newline='', encoding='utf-8') as f:
+		writer = csv.writer(f)
+		writer.writerow(header)
+		writer.writerows(updated_rows)
+import shutil
+def cleanup():
     full_path = os.path.join(os.path.dirname(__file__), 'fullarticles.csv')
     header = FULLARTICLES_COLUMNS
-    full_dir = os.path.dirname(full_path)
+    finalpdfs_dir = os.path.join(os.path.dirname(__file__), 'finalpdfs')
+    os.makedirs(finalpdfs_dir, exist_ok=True)
     rows = []
     with open(full_path, newline='', encoding='utf-8') as f:
         reader = csv.reader(f)
@@ -158,23 +199,25 @@ def fill_general_field_for_AM():
     for row in data_rows:
         if len(row) < len(header):
             row += [''] * (len(header) - len(row))
-        if 'source' in header and row[header.index('source')] == 'AM':
-            path_val = row[header.index('path')]
-            parts = path_val.split(os.sep)
-            try:
-                am_index = parts.index('AM')
-                field = parts[am_index + 1] if len(parts) > am_index + 1 else ''
-            except ValueError:
-                field = ''
-            row[header.index('general_field')] = field
+        path_idx = header.index('path') if 'path' in header else None
+        if path_idx is not None:
+            pdf_path = row[path_idx]
+            if pdf_path.lower().endswith('.pdf') and os.path.isfile(os.path.join(os.path.dirname(full_path), pdf_path)):
+                abs_pdf_path = os.path.join(os.path.dirname(full_path), pdf_path)
+                # Copy to finalpdfs with same filename
+                filename = os.path.basename(pdf_path)
+                dest_path = os.path.join(finalpdfs_dir, filename)
+                shutil.copy2(abs_pdf_path, dest_path)
+                # Update path to be relative to finalpdfs
+                row[path_idx] = os.path.relpath(dest_path, os.path.dirname(full_path))
         updated_rows.append(row)
-    # Write back (without header)
+    # Write back (with header)
     with open(full_path, 'w', newline='', encoding='utf-8') as f:
         writer = csv.writer(f)
         writer.writerow(header)
         writer.writerows(updated_rows)
 
-
 if __name__ == '__main__':
-	fill_general_field_for_AM()
+   
+    cleanup()
     

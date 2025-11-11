@@ -20,3 +20,4 @@ docs/_build/
 # Ignore all PDFs and DOCXs under scrapping directory
 scrapping/**/*.pdf
 scrapping/**/*.docx
+raw_dataset/finalpdfs/**.pdf
