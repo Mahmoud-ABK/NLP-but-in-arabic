@@ -12,8 +12,11 @@
 - abstract_en  
   The article’s abstract in English (human or machine translation). If machine-translated, record that fact (e.g., in a note or flag).
 
-- field  
+- general field  
   The subject area or classification label for the article (e.g., "economics", "literature").
+
+- field 
+  more specific than general field 
 
 - authors  
   The ordered list of author names (e.g., semicolon-separated string or JSON array).
