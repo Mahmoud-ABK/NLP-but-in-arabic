@@ -1,25 +1,22 @@
-# Ignore Python cache files
-**/__pycache__/
-*.pyc
-*.pyo
-*.pyd
+# Python cache
+__pycache__/
+*.py[cod]
 
-# Ignore virtual environments
-**/venv/
-**/.venv/
-**/env/
-**/.env/
+# Virtual environments
+venv/
+.env/
+env/
+.venv/
 
-# Ignore documentation build artifacts
-**/docs/_build/
-**/build/
-**/dist/
+# Build artifacts
+build/
+dist/
+docs/_build/
 
-# Ignore Jupyter Notebook files and checkpoints
-**/.ipynb_checkpoints/
-**/.virtual_documents/
+# Jupyter checkpoints
 .ipynb_checkpoints/
 .virtual_documents/
-# Ignore any PDF files under scrapping folder (anywhere)
+
+# Ignore all PDFs and DOCXs under scrapping directory
 scrapping/**/*.pdf
 scrapping/**/*.docx
