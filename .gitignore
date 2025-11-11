@@ -16,10 +16,10 @@
 **/dist/
 
 # Ignore Jupyter Notebook files and checkpoints
-**/.ipynb_checkpoints
-**/.virtual_documents
-.ipynb_checkpoints
-.virtual_documents
+**/.ipynb_checkpoints/
+**/.virtual_documents/
+.ipynb_checkpoints/
+.virtual_documents/
 # Ignore any PDF files under scrapping folder (anywhere)
 scrapping/**/*.pdf
 scrapping/**/*.docx
