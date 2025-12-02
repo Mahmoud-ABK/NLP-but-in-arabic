@@ -1,0 +1,46 @@
+graph TD
+    %% Nodes
+    Start("Input: step1_extracted_text.csv")
+    LoadBalancer(("Load Balancer"))
+
+    subgraph Inference_Layer ["Inference Layer (Parallel)"]
+        QwenA["Qwen 2.5 (Worker 1)"]
+        QwenB["Qwen 2.5 (Worker 2)"]
+        QwenC["Qwen 2.5 (Worker N)"]
+    end
+
+    subgraph Processing_Layer ["Data Parsing & Cleaning"]
+        Parse["Parse JSON String"]
+        Validate["Validate Schema"]
+        Dates["Normalize Dates (ISO 8601)"]
+        MapFields["Map to Columns"]
+    end
+
+    End("Output: final_processed_data.csv")
+
+    %% Connections
+    Start --> LoadBalancer
+    
+    LoadBalancer -- "Raw Text" --> QwenA
+    LoadBalancer -- "Raw Text" --> QwenB
+    LoadBalancer -- "Raw Text" --> QwenC
+    
+    QwenA -- "JSON String" --> Parse
+    QwenB -- "JSON String" --> Parse
+    QwenC -- "JSON String" --> Parse
+    
+    Parse --> Validate
+    Validate --> Dates
+    Dates --> MapFields
+    MapFields --> End
+
+    %% Styling
+    classDef input fill:#e1f5fe,stroke:#01579b,stroke-width:2px;
+    classDef brain fill:#e0f2f1,stroke:#00695c,stroke-width:2px;
+    classDef logic fill:#fff9c4,stroke:#fbc02d,stroke-width:2px;
+    classDef output fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px;
+
+    class Start input;
+    class QwenA,QwenB,QwenC brain;
+    class Parse,Validate,Dates,MapFields logic;
+    class End output;

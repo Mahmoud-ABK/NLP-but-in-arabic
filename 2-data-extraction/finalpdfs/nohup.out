@@ -1,0 +1,4 @@
+** Message: 21:23:41.984: Connecting to org.freedesktop.Tracker3.Miner.Files
+
+(org.gnome.Nautilus:17264): Gtk-WARNING **: 21:23:42.015: Unknown key gtk-modules in /home/mahmoud/.config/gtk-4.0/settings.ini
+** Message: 23:20:18.230: Connecting to org.freedesktop.Tracker3.Miner.Files

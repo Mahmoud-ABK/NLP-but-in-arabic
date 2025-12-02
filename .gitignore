@@ -17,7 +17,13 @@ docs/_build/
 .ipynb_checkpoints/
 .virtual_documents/
 
+*.pdf
+**/*.pdf
+*.gguf
+**/*.gguf
 # Ignore all PDFs and DOCXs under scrapping directory
 scrapping/**/*.pdf
 scrapping/**/*.docx
 raw_dataset/finalpdfs/**.pdf
+
+

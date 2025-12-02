@@ -1,0 +1,40 @@
+graph TD
+    %% Nodes
+    Start(" Input: original_dataset.csv")
+    RowLoop["Iterate Rows"]
+    
+    subgraph Extraction_Logic ["PDF Processing"]
+        ReadPDF["Read PDF from 'path'"]
+        CheckText{"Is Text Clean?"}
+        
+        ExtractText["Extract Text Directly"]
+        RunOCR["Run OCR (PaddleOCR)"]
+        
+        LimitPages["Truncate to First 2-3 Pages"]
+    end
+    
+    AppendRow["Append 'raw_text' to Row"]
+    SaveInter(" Output: step1_extracted_text.csv")
+
+    %% Connections
+    Start --> RowLoop
+    RowLoop --> ReadPDF
+    ReadPDF --> CheckText
+    
+    CheckText -- Yes --> ExtractText
+    CheckText -- No --> RunOCR
+    
+    ExtractText --> LimitPages
+    RunOCR --> LimitPages
+    
+    LimitPages --> AppendRow
+    AppendRow --> SaveInter
+
+    %% Styling
+    classDef input fill:#e1f5fe,stroke:#01579b,stroke-width:2px;
+    classDef vision fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px;
+    classDef output fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px;
+
+    class Start input;
+    class ExtractText,RunOCR,LimitPages vision;
+    class SaveInter output;

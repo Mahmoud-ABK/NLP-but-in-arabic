@@ -1,0 +1,10 @@
+flowchart TD
+    A((Start: Load Raw Text))
+    --> B["Step 1: Remove Non-Arabic Content"]
+    --> C["Step 2: Remove Punctuation & Symbols"]
+    --> D["Step 3: Clean Whitespace"]
+    --> E["Step 4: Remove Diacritics"]
+    --> F["Step 5: Normalize Characters"]
+    --> G["Step 6: Tokenize & Stem"]
+    --> H["Step 7: Remove Stopwords"]
+    --> I((End: Save Cleaned Tokens))

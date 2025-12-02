@@ -1,0 +1,57 @@
+services:
+  qwen-extractor-1:
+    image: ghcr.io/ggml-org/llama.cpp:server
+    container_name: qwen-extractor-1
+
+    ports:
+      - "6000:8080"
+
+    volumes:
+      - ./gguf:/models:z
+      # - ./ssl:/ssl:z   # (Optional) For SSL certificates
+
+    environment:
+      # --- Core Model & Server Settings ---
+      - LLAMA_ARG_MODEL=/models/qwen2.5-3b-instruct-q5_k_m.gguf
+      - LLAMA_ARG_ALIAS=qwen-extractor-1
+      # --- Quality & Context Settings ---
+      # Sets the chat format. CRITICAL for getting correct responses.
+      #- LLAMA_ARG_CHAT_TEMPLATE=mistral-v1
+      # Sets the context window size. 4096 is a good balance for dev.
+      # PROD: Consider increasing to 8192 or more if you have enough RAM.
+      - LLAMA_ARG_CTX_SIZE=8192
+      # Sets the maximum number of tokens to generate. -1 is unlimited.
+      - LLAMA_ARG_N_PREDICT=-1
+
+      # --- Basic Performance Tuning ---
+      # Enables continuous batching for higher throughput. Recommended for both dev and prod.
+      - LLAMA_ARG_CONT_BATCHING=1
+      # Logical batch size to use with continuous batching. 512 is a good default.
+      #- LLAMA_ARG_BATCH=2048
+
+      # --- Advanced CPU & Memory Tuning (Dev Values) ---
+
+      # --- CPU Threads ---
+      # Number of CPU threads for generation. A lower value for dev to keep your machine responsive.
+      # PROD: Set this to the number of PHYSICAL CPU cores on your server (e.g., 16, 32).
+      - LLAMA_ARG_THREADS=6
+      # Number of threads for handling HTTP requests. 2 is fine for dev.
+      # PROD: Increase if you have many concurrent users (e.g., 8).
+      - LLAMA_ARG_THREADS_HTTP=1
+
+      # --- Memory Management ---
+      # Locks the model in RAM. Essential for consistent performance in both dev and prod.
+      - LLAMA_ARG_MLOCK=1
+      # Reduces RAM usage for the KV cache by using 8-bit quantization. Great for memory-constrained dev environments.
+      # PROD: Use 'f16' for maximum quality if you have ample RAM, or stick with 'q8_0' to save memory.
+      #- LLAMA_ARG_CACHE_TYPE_K=q8_0
+      #- LLAMA_ARG_CACHE_TYPE_V=q8_0
+      
+      # --- Optional/Situational Settings (Commented Out) ---
+      # Pre-loads the entire model into RAM on startup. Slower start, but more predictable performance.
+      # PROD: Uncomment this for stable performance in production -> LLAMA_ARG_NO_MMAP=1
+      - LLAMA_ARG_NO_MMAP=1
+      
+      # Use only if your server has a NUMA architecture (e.g., multiple physical CPUs).
+      # PROD: If on NUMA hardware, uncomment this for a potential speed boost -> LLAMA_ARG_NUMA=1
+      # - LLAMA_ARG_NUMA=1
