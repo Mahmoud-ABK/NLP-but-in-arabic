@@ -12,7 +12,7 @@ services:
 
     environment:
       # --- Core Model & Server Settings ---
-      - LLAMA_ARG_MODEL=/models/qwen2.5-3b-instruct-q5_k_m.gguf
+      - LLAMA_ARG_MODEL=/models/Qwen2.5-7B-Instruct-Q4_K_M.gguf
       - LLAMA_ARG_ALIAS=qwen-extractor-1
       # --- Quality & Context Settings ---
       # Sets the chat format. CRITICAL for getting correct responses.
