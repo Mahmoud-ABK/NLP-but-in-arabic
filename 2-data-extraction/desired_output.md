@@ -7,14 +7,15 @@
   The article’s abstract in Arabic (original text).
 - general field  
   The subject area or classification label for the article (e.g., "economics", "literature").
-- field 
-  more specific than general field 
 - authors  
   The ordered list of author names (e.g., semicolon-separated string or JSON array).
 - publish_date  
-  The publication date in ISO 8601 format (YYYY-MM-DD); null if unknown.
+  The publication date in ISO 8601 format (YYYY-MM-DD); null if unknown.( just for statistics)
 
+
+to be dropped lack of compute power 
 -authors_en
 - abstract_en  
-  The article’s abstract in English (human or machine translation). If machine-translated, record that fact (e.g., in a note or flag).
 -title_en
+- field 
+  more specific than general field 

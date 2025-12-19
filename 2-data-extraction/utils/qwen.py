@@ -50,30 +50,27 @@ def getTokenCount(text: str, port: int = 6000) -> int:
         raise RuntimeError(f"Token count request failed: {e}")
 
 
-def extract_article_metadata(pages: list[str], port: int = 6000) -> dict:
+def extract_article_metadata(page1: str, page2 : str , port: int = 6000) -> dict:
     """
-    Extracts metadata from a list of page texts using the local LLM.
-    
+    Extract metadata from two page texts using the local LLM.
+
     Args:
-        pages (list[str]): A list where each string represents the text of one page.
+        page1 (str): Text of the first page.
+        page2 (str): Text of the second page.
         port (int): The port of the running llama.cpp server.
-        
+
     Returns:
-        dict: The extracted metadata in JSON format, or None if failed.
+        dict: Extracted metadata in JSON format, or None if failed.
     """
-    
+    pages = [page1,page2]
     # 1. Validation & Pre-processing
     if not pages or all(not p.strip() for p in pages):
         print("Warning: Received empty page list.")
-        return None
+        return {}
 
     # We only need the first 2 pages for metadata (Title, Abstract, Authors usually appear here).
     # Joining with a separator helps the model understand page breaks, though not strictly necessary.
     joined_text = "\n--- PAGE BREAK ---\n".join(pages[:2])
-    
-    # Truncate to ~1500 tokens (approx 4000-5000 chars) to keep CPU inference fast
-    # and prevent context window overflow.
-    clean_text = joined_text[:4500].replace('"', "'").replace("\\", "")
 
     # 2. Define the Prompt
     system_instruction = (
@@ -89,7 +86,6 @@ def extract_article_metadata(pages: list[str], port: int = 6000) -> dict:
       "title": "string (Exact title found in text)",
       "abstract_ar": "string (The Arabic abstract text)",
       "general_field": "string (Broad category e.g. Economics, Law, Engineering)",
-      "field": "string (Specific topic e.g. Macroeconomics, Civil Law)",
       "authors": ["string", "string"],
       "publish_date": "YYYY-MM-DD (or null)"
     }}
@@ -102,7 +98,31 @@ def extract_article_metadata(pages: list[str], port: int = 6000) -> dict:
 
     ### INPUT TEXT:
     \"\"\"
-    {clean_text}
+    {joined_text}
+    \"\"\"
+    """
+    # 2. Redefined 
+    
+    system_instruction = (
+        "You are a strict API endpoint for Arabic bibliometrics. "
+        "Output ONLY raw JSON. Do not use Markdown formatting (```json)."
+    )
+    
+    user_prompt = f"""
+    Extract metadata from the text below into this exact JSON structure:
+    ignore unidentifiable names and ocr noise in authors. 
+    
+    {{
+      "title": "String (Original Arabic title)",
+      "abstract_ar": "String (VERBATIM copy of the Arabic abstract. Do NOT summarize, edit, or truncate. Preserve all original text.)",
+      "general_field": "String (Broad category in ENGLISH, e.g., Law, Medicine)",
+      "authors": ["String"] (List of names only. Remove titles like Dr., Prof., أ.د, د.),
+      "publish_date": "YYYY-MM-DD (Use YYYY-01-01 if only year exists)"
+    }}
+    
+    ### INPUT TEXT:
+    \"\"\"
+    {joined_text}
     \"\"\"
     """
 
@@ -114,8 +134,9 @@ def extract_article_metadata(pages: list[str], port: int = 6000) -> dict:
             {"role": "user", "content": user_prompt}
         ],
         "temperature": 0.1,    # Low temp for factual extraction
-        "max_tokens": 1024,    # Enough for abstract + metadata
-        "stream": False
+        #"max_tokens": 2048,    # Enough for abstract + metadata
+        "stream": False,
+        "response_format": {"type": "json_object"}
     }
 
     # 4. Call Inference
