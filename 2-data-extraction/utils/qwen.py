@@ -7,7 +7,7 @@ import re
 
 API_HEADER = {"Content-Type": "application/json"}
 
-def infer(payload: dict, port: int = 6000) -> dict:
+def infer(payload: dict, port: int = 6000 , host:str="localhost") -> dict:
     """
     Send a JSON payload to the LLM API and return the response.
     Args:
@@ -16,7 +16,8 @@ def infer(payload: dict, port: int = 6000) -> dict:
     Returns:
         dict: The model's response.
     """
-    url = f"http://localhost:{port}/v1/chat/completions"
+    url = f"http://{host}:{port}/v1/chat/completions"
+    print(url)
     try:
         response = requests.post(url, headers=API_HEADER, json=payload)
         response.raise_for_status()
@@ -50,7 +51,7 @@ def getTokenCount(text: str, port: int = 6000) -> int:
         raise RuntimeError(f"Token count request failed: {e}")
 
 
-def extract_article_metadata(page1: str, page2 : str , port: int = 6000) -> dict:
+def extract_article_metadata(page1: str, page2 : str , port: int = 6000 ,host="localhost") -> dict:
     """
     Extract metadata from two page texts using the local LLM.
 
@@ -72,35 +73,6 @@ def extract_article_metadata(page1: str, page2 : str , port: int = 6000) -> dict
     # Joining with a separator helps the model understand page breaks, though not strictly necessary.
     joined_text = "\n--- PAGE BREAK ---\n".join(pages[:2])
 
-    # 2. Define the Prompt
-    system_instruction = (
-        "You are an expert bibliometric assistant specialized in Arabic academic texts. "
-        "You strictly output valid JSON with no markdown formatting or conversational text."
-    )
-
-    user_prompt = f"""
-    Analyze the following academic text (from the first two pages) and extract the metadata into a JSON object.
-
-    ### TARGET JSON SCHEMA:
-    {{
-      "title": "string (Exact title found in text)",
-      "abstract_ar": "string (The Arabic abstract text)",
-      "general_field": "string (Broad category e.g. Economics, Law, Engineering)",
-      "authors": ["string", "string"],
-      "publish_date": "YYYY-MM-DD (or null)"
-    }}
-
-    ### EXTRACTION RULES:
-    1. **Authors**: Extract names only. Remove titles like "Dr.", "Prof.", "أ.د", "دكتور".
-    2. **Dates**: Convert dates to ISO 8601 (YYYY-MM-DD). If only the year is found (e.g., 2022), use "2022-01-01".
-    3. **Missing Data**: If a field is not found, set it to null.
-    4. **Language**: Keep 'title' and 'abstract_ar' in their original language (usually Arabic). 'general_field' and 'field' should be in English.
-
-    ### INPUT TEXT:
-    \"\"\"
-    {joined_text}
-    \"\"\"
-    """
     # 2. Redefined 
     
     system_instruction = (
@@ -116,7 +88,8 @@ def extract_article_metadata(page1: str, page2 : str , port: int = 6000) -> dict
       "title": "String (Original Arabic title)",
       "abstract_ar": "String (VERBATIM copy of the Arabic abstract. Do NOT summarize, edit, or truncate. Preserve all original text.)",
       "general_field": "String (Broad category in ENGLISH, e.g., Law, Medicine)",
-      "authors": ["String"] (List of names only. Remove titles like Dr., Prof., أ.د, د.),
+      "authors": ["string", "string",....] (List of names only. Remove titles like Dr., Prof., أ.د, د.),
+      "keywords":["string", "string",....] (list of keywords as they are )
       "publish_date": "YYYY-MM-DD (Use YYYY-01-01 if only year exists)"
     }}
     
@@ -141,7 +114,7 @@ def extract_article_metadata(page1: str, page2 : str , port: int = 6000) -> dict
 
     # 4. Call Inference
     try:
-        response_data = infer(payload, port=port)
+        response_data = infer(payload, port=port,host=host)
         content = response_data['choices'][0]['message']['content']
 
         # 5. Parse and Clean Response

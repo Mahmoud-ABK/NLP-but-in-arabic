@@ -1,0 +1,26 @@
+flowchart TD
+    %% Compact Styling
+    classDef node fill:#e3f2fd,stroke:#1565c0,stroke-width:2px;
+    classDef choice fill:#fff9c4,stroke:#fbc02d,stroke-width:2px;
+    classDef endNode fill:#f1f8e9,stroke:#33691e,stroke-width:2px,rx:5,ry:5;
+
+    Start([Start]) --> Prep["Merge & Normalize Text"]
+    Prep --> CheckHeader{"Header Found?<br/>(Abstract/Mulakhas)"}
+
+    %% Path 1: Standard
+    CheckHeader -- Yes --> Extract1["Extract Text Block<br/>(Until Intro/Keywords)"]
+    Extract1 --> Validate{"Validate Length"}
+
+    %% Path 2: Fallback
+    CheckHeader -- No --> CheckVerb{"Fallback Verb Found?<br/>(e.g. 'The study aimed')"}
+    CheckVerb -- Yes --> Extract2["Extract from Verb<br/>(Heuristic Window)"]
+    Extract2 --> Validate
+
+    %% Outcomes
+    Validate -- Valid --> Success([Return Abstract])
+    Validate -- Invalid --> Fail([Return None])
+    CheckVerb -- No --> Fail
+
+    class Start,Prep,Extract1,Extract2 node;
+    class CheckHeader,CheckVerb,Validate choice;
+    class Success,Fail endNode;

@@ -1,0 +1,61 @@
+flowchart LR
+    %% ==========================================
+    %% GLOBAL STYLES (Simple & Compact)
+    %% ==========================================
+    classDef node fill:#e3f2fd,stroke:#1565c0,stroke-width:2px;
+    classDef choice fill:#fff9c4,stroke:#fbc02d,stroke-width:2px;
+    classDef success fill:#f1f8e9,stroke:#33691e,stroke-width:2px,rx:5,ry:5;
+    classDef fail fill:#ffebee,stroke:#c62828,stroke-width:2px,rx:5,ry:5;
+
+    %% ==========================================
+    %% LEFT PANEL: ABSTRACT
+    %% ==========================================
+    subgraph Abstract ["ABSTRACT EXTRACTION"]
+        direction TB
+        A_Start([Start]) --> A_Head{"Header Found?"}
+        
+        %% Path 1: Header
+        A_Head -- Yes --> A_Ext1[Extract Block]
+        A_Ext1 --> A_Val{"Validate"}
+
+        %% Path 2: Fallback
+        A_Head -- No --> A_Verb{"Fallback Verb?"}
+        A_Verb -- Yes --> A_Ext2[Extract from Verb]
+        A_Ext2 --> A_Val
+
+        %% Outcomes
+        A_Val -- Valid --> A_OK([Return Abstract])
+        A_Val -- Invalid --> A_No([Return None])
+        A_Verb -- No --> A_No
+    end
+
+    %% ==========================================
+    %% RIGHT PANEL: KEYWORDS
+    %% ==========================================
+    subgraph Keywords ["KEYWORD EXTRACTION"]
+        direction TB
+        K_Start([Start]) --> K_Head{"Header Found?"}
+        
+        %% Logic
+        K_Head -- Yes --> K_Line[Get Single Line]
+        K_Line --> K_Clean[Clean & Split]
+        K_Clean --> K_Check{"Valid Tokens?"}
+        
+        %% Outcomes
+        K_Check -- Yes --> K_OK([Return List])
+        K_Check -- No --> K_No([Return None])
+        K_Head -- No --> K_No
+    end
+
+    %% ==========================================
+    %% GLUE (Force Top Alignment)
+    %% ==========================================
+    A_Start ~~~ K_Start
+
+    %% ==========================================
+    %% APPLY CLASSES
+    %% ==========================================
+    class A_Start,K_Start,A_Ext1,A_Ext2,K_Line,K_Clean node;
+    class A_Head,A_Verb,A_Val,K_Head,K_Check choice;
+    class A_OK,K_OK success;
+    class A_No,K_No fail;

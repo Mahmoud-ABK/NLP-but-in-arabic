@@ -24,7 +24,7 @@ services:
 
       # ---- Batch/UBatch for CPU inference ----
       - LLAMA_ARG_BATCH=2048
-      - LLAMA_ARG_UBATCH=512
+      - LLAMA_ARG_UBATCH=256
 
       # ---- Threads ----
       - LLAMA_ARG_THREADS=6
@@ -40,4 +40,3 @@ services:
 
         # ---- Performance ----
       - LLAMA_ARG_FLASH_ATTN=1
-

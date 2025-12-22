@@ -1,0 +1,18 @@
+%%{init: { 
+  "theme": "default",
+  "themeVariables": { 
+    "fontSize": "12px",
+    "lineHeight": "14px"
+  },
+  "flowchart": { "nodeSpacing": 20, "rankSpacing": 20 }
+}}%%
+flowchart TD
+    A[Input Article X] --> B[Find Nearest Article]
+    B --> C[Candidates = Authors]
+    C --> D{Only 1 Author?}
+    D -- Yes --> E([Select Author])
+    D -- No --> F[Next Nearest Article]
+    F --> G{Any Candidates Here?}
+    G -- Yes, one --> E
+    G -- Yes, many --> H[Keep Matching Authors] --> F
+    G -- No --> F

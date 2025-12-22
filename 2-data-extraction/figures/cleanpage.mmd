@@ -1,0 +1,20 @@
+%%{init: { 
+  "theme": "default",
+  "themeVariables": { 
+    "fontSize": "11px",
+    "lineHeight": "12px"
+  },
+  "flowchart": { 
+    "nodeSpacing": 20,
+    "rankSpacing": 25
+  }
+}}%%
+flowchart TD
+    A[Raw OCR Text] --> B[Arabic Normalization]
+    B --> C[Fix Hyphenation]
+    C --> D[Layout Cleanup]
+    D --> E[Regex Filter]
+    E --> F[Split into Blocks and remove non arabic blocs]
+
+    F --> L[Whitespace Cleanup]
+    L --> M[Final Clean Text]

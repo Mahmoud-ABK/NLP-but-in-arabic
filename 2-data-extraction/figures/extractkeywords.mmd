@@ -1,0 +1,21 @@
+flowchart TD
+    %% Compact Styling
+    classDef node fill:#e3f2fd,stroke:#1565c0,stroke-width:2px;
+    classDef choice fill:#fff9c4,stroke:#fbc02d,stroke-width:2px;
+    classDef endNode fill:#f1f8e9,stroke:#33691e,stroke-width:2px,rx:5,ry:5;
+
+    Start([Start]) --> Search{"'Keywords' Header<br/>Found?"}
+
+    Search -- Yes --> GetLine["Extract Specific Line<br/>(Stop at Newline)"]
+    GetLine --> Clean["Remove Stop Words<br/>(e.g. Intro markers)"]
+    
+    Clean --> Split["Split & Filter Tokens<br/>(Delimiter: , ; -)"]
+    Split --> CheckCount{"Valid Tokens<br/>Remaining?"}
+
+    CheckCount -- Yes --> Success([Return List])
+    CheckCount -- No --> Fail([Return None])
+    Search -- No --> Fail
+
+    class Start,GetLine,Clean,Split node;
+    class Search,CheckCount choice;
+    class Success,Fail endNode;
